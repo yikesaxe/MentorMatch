@@ -16,16 +16,44 @@ function initializeDatabase() {
           headline TEXT,
           location TEXT,
           email TEXT UNIQUE,
-          password TEXT
+          password TEXT,
+          skills TEXT,
+          interests TEXT,
+          goals TEXT,
+          userType TEXT
         )`,
         (err) => {
           if (err) {
             reject(err);
           } else {
-            resolve();
+            prefillDatabase()
+              .then(resolve)
+              .catch(reject);
           }
         }
       );
+    });
+  });
+}
+
+function prefillDatabase() {
+  const users = [
+    { firstName: 'John', lastName: 'Doe', email: 'john@example.com', password: 'password', location: 'New York', skills: '["JavaScript", "React"]', interests: '["Coding", "Hiking"]', goals: '["Learn React"]', userType: 'mentor' },
+    { firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com', password: 'password', location: 'Los Angeles', skills: '["Python", "Django"]', interests: '["Reading", "Cooking"]', goals: '["Build a website"]', userType: 'mentee' }
+    // Add more dummy data as needed
+  ];
+
+  return new Promise((resolve, reject) => {
+    const stmt = db.prepare('INSERT INTO user (firstName, lastName, email, password, location, skills, interests, goals, userType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    users.forEach(user => {
+      stmt.run(user.firstName, user.lastName, user.email, user.password, user.location, user.skills, user.interests, user.goals, user.userType);
+    });
+    stmt.finalize((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
 }

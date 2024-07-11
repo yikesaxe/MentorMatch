@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db, initializeDatabase } = require('./db');
+const { PythonShell } = require('python-shell'); // Add this line
 
 const app = express();
 const port = 8000;
@@ -109,6 +110,41 @@ app.put('/user/:id', verifyToken, (req, res) => {
   );
 });
 
+// Matching endpoint (protected)
+app.get('/match/:id', verifyToken, (req, res) => {
+  if (req.userId != req.params.id) {
+    return res.status(403).send({ auth: false, message: 'Unauthorized access.' });
+  }
+
+  db.all('SELECT * FROM user', (err, rows) => {
+    if (err) {
+      console.error('Error fetching profiles:', err);
+      res.status(500).json({ error: 'Failed to fetch profiles' });
+      return;
+    }
+
+    const profiles = rows.map(row => ({
+      ...row,
+      skills: JSON.parse(row.skills || '[]'),
+      interests: JSON.parse(row.interests || '[]'),
+      goals: JSON.parse(row.goals || '[]')
+    }));
+
+    PythonShell.run('matching.py', { args: [JSON.stringify(profiles)] }, (err, results) => {
+      if (err) {
+        console.error('Error running matching script:', err);
+        res.status(500).json({ error: 'Failed to run matching algorithm' });
+        return;
+      }
+
+      const matches = JSON.parse(results[0]);
+      const userMatches = matches.find(match => match.mentee.id == req.params.id);
+
+      res.json(userMatches);
+    });
+  });
+});
+
 // Initialize the database and start the server
 initializeDatabase()
   .then(() => {
@@ -120,6 +156,3 @@ initializeDatabase()
   .catch((err) => {
     console.error('Failed to initialize database:', err);
   });
-
-
-
