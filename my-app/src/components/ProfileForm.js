@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ProfileForm = ({ user, onSave }) => {
   const [firstName, setFirstName] = useState(user.firstName || '');
@@ -7,6 +7,14 @@ const ProfileForm = ({ user, onSave }) => {
   const [headline, setHeadline] = useState(user.headline || '');
   const [location, setLocation] = useState(user.location || '');
 
+  useEffect(() => {
+    setFirstName(user.firstName || '');
+    setLastName(user.lastName || '');
+    setPreferredName(user.preferredName || '');
+    setHeadline(user.headline || '');
+    setLocation(user.location || '');
+  }, [user]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave({
@@ -14,7 +22,7 @@ const ProfileForm = ({ user, onSave }) => {
       lastName,
       preferredName,
       headline,
-      location,
+      location
     });
   };
 

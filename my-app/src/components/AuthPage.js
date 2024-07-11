@@ -7,39 +7,61 @@ const AuthPage = ({ setAuth }) => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [preferredName, setPreferredName] = useState('');
+  const [userType, setUserType] = useState('mentee');
+  const [university, setUniversity] = useState('');
+  const [skills, setSkills] = useState('');
+  const [interests, setInterests] = useState('');
+  const [goals, setGoals] = useState('');
+  const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/login', { email, password })
-      .then(response => {
-        const token = response.data.token;
-        const id = response.data.id;
-        setAuth(token, id);
-        localStorage.setItem('token', token);  // Store token in local storage
-        localStorage.setItem('id', id);  // Store id in local storage
-        setError('');
-      })
-      .catch(error => {
-        console.error('Error logging in:', error);
-        setError('Login failed');
-      });
+    try {
+      const response = await axios.post('http://localhost:8001/login', { email, password });
+      const token = response.data.token;
+      const id = response.data.id;
+      setAuth(token, id);
+      localStorage.setItem('token', token);
+      localStorage.setItem('id', id);
+      setError('');
+    } catch (error) {
+      console.error('Error logging in:', error);
+      setError('Login failed');
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/register', { firstName, lastName, email, password })
-      .then(response => {
-        setSuccess('Registration successful. Please log in.');
-        setError('');
-        setIsLogin(true); // Switch to login after successful registration
-      })
-      .catch(error => {
-        console.error('Error registering:', error);
+    const newUser = {
+      firstName,
+      lastName,
+      preferredName,
+      email,
+      password,
+      userType,
+      university,
+      skills: JSON.stringify(skills.split(',')),
+      interests: JSON.stringify(interests.split(',')),
+      goals: JSON.stringify(goals.split(',')),
+      location
+    };
+    try {
+      await axios.post('http://localhost:8001/register', newUser);
+      setSuccess('Registration successful. Please log in.');
+      setError('');
+      setIsLogin(true);
+    } catch (error) {
+      console.error('Error registering:', error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
         setError('Registration failed');
-        setSuccess('');
-      });
+      }
+      setSuccess('');
+    }
   };
 
   return (
@@ -66,6 +88,71 @@ const AuthPage = ({ setAuth }) => {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Preferred Name:</label>
+                <input
+                  type="text"
+                  value={preferredName}
+                  onChange={(e) => setPreferredName(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">User Type:</label>
+                <select
+                  value={userType}
+                  onChange={(e) => setUserType(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                >
+                  <option value="mentee">Mentee</option>
+                  <option value="mentor">Mentor</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-700">University:</label>
+                <input
+                  type="text"
+                  value={university}
+                  onChange={(e) => setUniversity(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Skills (comma-separated):</label>
+                <input
+                  type="text"
+                  value={skills}
+                  onChange={(e) => setSkills(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Interests (comma-separated):</label>
+                <input
+                  type="text"
+                  value={interests}
+                  onChange={(e) => setInterests(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Goals (comma-separated):</label>
+                <input
+                  type="text"
+                  value={goals}
+                  onChange={(e) => setGoals(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Location:</label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                   className="mt-1 p-2 w-full border rounded-md"
                 />
               </div>
