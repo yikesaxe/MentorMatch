@@ -4,7 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db, initializeDatabase } = require('./db');
-const { PythonShell } = require('python-shell'); // Add this line
+const { PythonShell } = require('python-shell');
 
 const app = express();
 const port = 8000;
@@ -36,12 +36,12 @@ app.get('/', (req, res) => {
 
 // User registration
 app.post('/register', (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, location, skills, interests, goals, userType } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 8);
 
   db.run(
-    `INSERT INTO user (firstName, lastName, email, password) VALUES (?, ?, ?, ?)`,
-    [firstName, lastName, email, hashedPassword],
+    `INSERT INTO user (firstName, lastName, email, password, location, skills, interests, goals, userType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [firstName, lastName, email, hashedPassword, location, skills, interests, goals, userType],
     function (err) {
       if (err) {
         console.error('Error registering user:', err);
@@ -53,6 +53,7 @@ app.post('/register', (req, res) => {
     }
   );
 });
+
 
 // User login
 app.post('/login', (req, res) => {
@@ -95,16 +96,20 @@ app.put('/user/:id', verifyToken, (req, res) => {
     return res.status(403).send({ auth: false, message: 'Unauthorized access.' });
   }
 
-  const { firstName, lastName, preferredName, headline, location } = req.body;
+  const { firstName, lastName, location, skills, interests, goals, userType } = req.body;
   db.run(
-    `UPDATE user SET firstName = ?, lastName = ?, preferredName = ?, headline = ?, location = ? WHERE id = ?`,
-    [firstName, lastName, preferredName, headline, location, req.params.id],
+    `UPDATE user SET firstName = ?, lastName = ?, location = ?, skills = ?, interests = ?, goals = ?, userType = ? WHERE id = ?`,
+    [firstName, lastName, location, JSON.stringify(skills), JSON.stringify(interests), JSON.stringify(goals), userType, req.params.id],
     function (err) {
       if (err) {
         console.error('Error updating user data:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Failed to update user data' });
       } else {
-        res.json({ message: 'User updated successfully', changes: this.changes });
+        if (this.changes === 0) {
+          res.status(404).json({ message: 'User not found' });
+        } else {
+          res.json({ message: 'User updated successfully', changes: this.changes });
+        }
       }
     }
   );

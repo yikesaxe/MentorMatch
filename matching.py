@@ -102,7 +102,21 @@ def rank_mentors_for_mentees(profiles, api_key):
     return ranked_matches
 
 if __name__ == '__main__':
-    api_key = "your_api_key"
-    profiles = json.loads(sys.argv[1])
+    api_key = "668ffc84c608d925087664kah759c46"
+
+    import sys
+    import json
+
+    if len(sys.argv) < 2:
+        print("Usage: python matching.py <json_file>")
+        sys.exit(1)
+
+    try:
+        with open(sys.argv[1], 'r') as file:
+            profiles = json.load(file)
+            print("Parsed JSON successfully!")
+    except Exception as e:
+        print("Error decoding JSON:", e)
+    
     ranked_matches = rank_mentors_for_mentees(profiles, api_key)
-    print(json.dumps(ranked_matches))
+    print(json.dumps(ranked_matches, indent=4))
