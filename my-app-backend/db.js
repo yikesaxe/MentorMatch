@@ -25,6 +25,8 @@ function initializeDatabase() {
           password TEXT,
           matchedMentor INTEGER,
           similarMentors TEXT,
+          linkedinUrl TEXT,
+          profileImageUrl TEXT,
           FOREIGN KEY (matchedMentor) REFERENCES user (id)
         )`,
         (err) => {
@@ -44,12 +46,46 @@ function insertSampleData() {
   const sampleProfiles = require('./sampleProfiles');
 
   sampleProfiles.forEach((profile) => {
-    const { firstName, lastName, preferredName, userType, headline, location, university, skills, interests, goals, email, password, matchedMentor, similarMentors } = profile;
+    const {
+      firstName,
+      lastName,
+      preferredName,
+      userType,
+      headline,
+      location,
+      university,
+      skills,
+      interests,
+      goals,
+      email,
+      password,
+      matchedMentor,
+      similarMentors,
+      linkedinUrl,
+      profileImageUrl,
+    } = profile;
 
     db.run(
-      `INSERT INTO user (firstName, lastName, preferredName, userType, headline, location, university, skills, interests, goals, email, password, matchedMentor, similarMentors)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [firstName, lastName, preferredName, userType, headline, location, university, skills, interests, goals, email, password, matchedMentor, similarMentors],
+      `INSERT INTO user (firstName, lastName, preferredName, userType, headline, location, university, skills, interests, goals, email, password, matchedMentor, similarMentors, linkedinUrl, profileImageUrl)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        firstName,
+        lastName,
+        preferredName,
+        userType,
+        headline,
+        location,
+        university,
+        skills,
+        interests,
+        goals,
+        email,
+        password,
+        matchedMentor,
+        similarMentors,
+        linkedinUrl,
+        profileImageUrl,
+      ],
       function (err) {
         if (err) {
           console.error(`Error inserting profile: ${email}`, err);

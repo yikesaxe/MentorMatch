@@ -27,7 +27,7 @@ const App = () => {
     <Router>
       <div className="flex">
         {auth && <Sidebar handleLogout={handleLogout} id={id} />}
-        <div className="flex-1 ml-64">
+        <div className={`flex-1 ${auth ? 'ml-64' : ''}`}>
           <Routes>
             <Route path="/auth" element={<AuthPage setAuth={handleLogin} />} />
             <Route path="/profile/:id" element={auth ? <ProfilePage auth={auth} /> : <Navigate to="/auth" />} />
@@ -40,6 +40,4 @@ const App = () => {
 };
 
 export default App;
-
-
 

@@ -3,9 +3,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { db, initializeDatabase } = require('./db');
-const { fetchProfiles, rankMentorsForMentees } = require('./matching');
+const multer = require('multer');
+const path = require('path');
+const { db, initializeDatabase, insertSampleData } = require('./db');
 const sampleProfiles = require('./sampleProfiles');
+const { fetchProfiles, rankMentorsForMentees } = require('./matching');
 
 const app = express();
 const port = 8001;
@@ -13,6 +15,19 @@ const secretKey = 'your_secret_key';
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
 
 // Authentication middleware
 function verifyToken(req, res, next) {
@@ -35,80 +50,14 @@ app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
 
-// Function to insert sample data
-const insertSampleData = () => {
-  sampleProfiles.forEach(profile => {
-    // Check if the email already exists
-    db.get('SELECT COUNT(*) AS count FROM user WHERE email = ?', [profile.email], (err, row) => {
-      if (err) {
-        console.error('Error checking for existing email:', profile.email, err);
-        return;
-      }
-
-      if (row.count > 0) {
-        console.log(`Skipping insertion for existing email: ${profile.email}`);
-      } else {
-        db.run(
-          `INSERT INTO user (firstName, lastName, email, password, userType, location, university, skills, interests, goals, headline) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            profile.firstName,
-            profile.lastName,
-            profile.email,
-            bcrypt.hashSync(profile.password, 8),
-            profile.userType,
-            profile.location,
-            profile.university,
-            profile.skills,
-            profile.interests,
-            profile.goals,
-            profile.headline
-          ],
-          (err) => {
-            if (err) {
-              console.error('Error inserting profile:', profile.email, err);
-            } else {
-              console.log(`Profile inserted successfully for email: ${profile.email}`);
-            }
-          }
-        );
-      }
-    });
-  });
-
-  console.log('Sample data insertion complete');
-};
-
-// Function to run matching algorithm and update matches for all users
-const updateAllUserMatches = async () => {
-  try {
-    const profiles = await fetchProfiles();
-    console.log('Profiles fetched:', profiles);
-
-    const rankedMatches = await rankMentorsForMentees(profiles);
-    console.log('Ranked matches:', rankedMatches);
-
-    rankedMatches.forEach(({ mentee, mentors }) => {
-      if (mentors.length > 0) {
-        db.run(
-          `UPDATE user SET matchedMentor = ?, similarMentors = ? WHERE id = ?`,
-          [
-            mentors[0].mentor.id,
-            JSON.stringify(mentors.map(mentor => mentor.mentor.id)),
-            mentee.id
-          ],
-          (err) => {
-            if (err) {
-              console.error('Error updating user matches:', err);
-            }
-          }
-        );
-      }
-    });
-    console.log('All user matches updated successfully');
-  } catch (error) {
-    console.error('Error in updateAllUserMatches:', error);
+// Profile picture upload
+app.post('/upload', upload.single('profileImage'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send({ error: 'No file uploaded.' });
   }
-};
+  const profileImageUrl = `/uploads/${req.file.filename}`;
+  res.json({ profileImageUrl });
+});
 
 // User registration
 app.post('/register', async (req, res) => {
@@ -185,13 +134,9 @@ app.get('/user/:id/matches', verifyToken, async (req, res) => {
 
   try {
     const profiles = await fetchProfiles();
-    console.log('Profiles fetched:', profiles);
-
     const rankedMatches = await rankMentorsForMentees(profiles);
-    console.log('Ranked matches:', rankedMatches);
 
     const userMatches = rankedMatches.find(match => match.mentee.id === parseInt(req.params.id));
-    console.log('User matches:', userMatches);
 
     if (userMatches) {
       const mentorsData = userMatches.mentors.map(mentor => ({
@@ -204,8 +149,9 @@ app.get('/user/:id/matches', verifyToken, async (req, res) => {
         interests: mentor.mentor.interests,
         goals: mentor.mentor.goals,
         headline: mentor.mentor.headline,
+        linkedinUrl: mentor.mentor.linkedinUrl,
+        profileImageUrl: mentor.mentor.profileImageUrl, // Ensure this field is included
       }));
-      console.log('Mentors data:', mentorsData);
       res.json(mentorsData);
     } else {
       res.status(404).json({ message: 'No matches found for the user.' });
@@ -222,10 +168,10 @@ app.put('/user/:id', verifyToken, (req, res) => {
     return res.status(403).send({ auth: false, message: 'Unauthorized access.' });
   }
 
-  const { firstName, lastName, preferredName, headline, location } = req.body;
+  const { firstName, lastName, preferredName, headline, location, linkedinUrl, profileImageUrl } = req.body;
   db.run(
-    `UPDATE user SET firstName = ?, lastName = ?, preferredName = ?, headline = ?, location = ? WHERE id = ?`,
-    [firstName, lastName, preferredName, headline, location, req.params.id],
+    `UPDATE user SET firstName = ?, lastName = ?, preferredName = ?, headline = ?, location = ?, linkedinUrl = ?, profileImageUrl = ? WHERE id = ?`,
+    [firstName, lastName, preferredName, headline, location, linkedinUrl, profileImageUrl, req.params.id],
     function (err) {
       if (err) {
         console.error('Error updating user data:', err);
@@ -237,6 +183,35 @@ app.put('/user/:id', verifyToken, (req, res) => {
     }
   );
 });
+
+// Function to run matching algorithm and update matches for all users
+const updateAllUserMatches = async () => {
+  try {
+    const profiles = await fetchProfiles();
+    const rankedMatches = await rankMentorsForMentees(profiles);
+
+    rankedMatches.forEach(({ mentee, mentors }) => {
+      if (mentors.length > 0) {
+        db.run(
+          `UPDATE user SET matchedMentor = ?, similarMentors = ? WHERE id = ?`,
+          [
+            mentors[0].mentor.id,
+            JSON.stringify(mentors.map(mentor => mentor.mentor.id)),
+            mentee.id
+          ],
+          (err) => {
+            if (err) {
+              console.error('Error updating user matches:', err);
+            }
+          }
+        );
+      }
+    });
+    console.log('All user matches updated successfully');
+  } catch (error) {
+    console.error('Error in updateAllUserMatches:', error);
+  }
+};
 
 // Reset database
 app.post('/reset-database', async (req, res) => {

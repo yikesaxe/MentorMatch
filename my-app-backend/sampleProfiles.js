@@ -3,82 +3,94 @@ const bcrypt = require('bcryptjs');
 const sampleProfiles = [
   // Mentors
   {
-    firstName: 'Alice',
-    lastName: 'Smith',
-    email: 'alice.mentor@example.com',
+    firstName: 'Blessing',
+    lastName: 'Ubani',
+    email: 'blessing@tagg.id',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
-    location: 'New York',
-    university: 'NYU',
-    skills: JSON.stringify(['Python', 'Machine Learning', 'Data Science']),
+    location: 'Palo Alto',
+    university: 'Brown University',
+    skills: JSON.stringify(['Python', 'Machine Learning', 'Data Science', 'Yapping.io']),
     interests: JSON.stringify(['Artificial Intelligence']),
     goals: 'Help mentees learn AI',
-    headline: 'AI Expert at NYU'
+    headline: 'AI Expert at every FAANG Company',
+    linkedinUrl: 'https://www.linkedin.com/in/blessing-ubani-jr/',
+    profileImageUrl: '/uploads/blessing.jpg',
   },
   {
-    firstName: 'Bob',
-    lastName: 'Johnson',
+    firstName: 'Philana',
+    lastName: 'B',
     email: 'bob.mentor@example.com',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
     location: 'New York',
-    university: 'NYU',
+    university: 'Northwestern University',
     skills: JSON.stringify(['JavaScript', 'React', 'Node.js']),
     interests: JSON.stringify(['Web Development']),
     goals: 'Guide mentees in web development',
-    headline: 'Full Stack Developer'
+    headline: 'Full Stack Developer',
+    linkedinUrl: 'https://www.linkedin.com/in/philanabenton/',
+    profileImageUrl: '/uploads/philana.jpg',
   },
   {
-    firstName: 'Eve',
-    lastName: 'Davis',
-    email: 'eve.mentor@example.com',
+    firstName: 'Precious',
+    lastName: 'Onah',
+    email: 'preciousonah12@gmail.com',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
     location: 'New York',
-    university: 'NYU',
+    university: 'Stillman College',
     skills: JSON.stringify(['Java', 'Spring', 'Microservices']),
     interests: JSON.stringify(['Backend Development']),
     goals: 'Mentor students in enterprise application development',
-    headline: 'Backend Specialist'
+    headline: 'Backend Specialist',
+    linkedinUrl: 'https://www.linkedin.com/in/preciousonah/',
+    profileImageUrl: '/uploads/precious.jpg',
   },
   {
-    firstName: 'Frank',
-    lastName: 'Miller',
-    email: 'frank.mentor@example.com',
+    firstName: 'Sofia',
+    lastName: 'Utoft',
+    email: 'sofieu26@gmail.com',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
-    location: 'New York',
-    university: 'NYU',
+    location: 'Boston',
+    university: 'Boston College',
     skills: JSON.stringify(['C++', 'Embedded Systems', 'Robotics']),
     interests: JSON.stringify(['Hardware and Robotics']),
     goals: 'Inspire interest in robotics and hardware programming',
-    headline: 'Robotics Engineer'
+    headline: 'Robotics Engineer',
+    linkedinUrl: 'https://www.linkedin.com/in/sofiautoft/',
+    profileImageUrl: '/uploads/sofia.jpg',
   },
   {
-    firstName: 'Grace',
-    lastName: 'Wilson',
-    email: 'grace.mentor@example.com',
+    firstName: 'Patrick',
+    lastName: 'Kariuki',
+    email: 'pkariuk1@jhu.edu',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
     location: 'New York',
-    university: 'NYU',
+    university: 'John Hopkins University',
     skills: JSON.stringify(['HTML', 'CSS', 'UI/UX Design']),
     interests: JSON.stringify(['Design']),
     goals: 'Help students build intuitive user interfaces',
-    headline: 'UI/UX Designer'
+    headline: 'UI/UX Designer',
+    linkedinUrl: 'https://www.linkedin.com/in/pkariuk1/',
+    profileImageUrl:'/uploads/patrick.jpg',
   },
   {
-    firstName: 'Hank',
-    lastName: 'Moore',
+    firstName: 'Sophie',
+    lastName: 'Agbekpenou',
     email: 'hank.mentor@example.com',
     password: bcrypt.hashSync('password', 8),
     userType: 'mentor',
     location: 'New York',
-    university: 'NYU',
+    university: 'Columbia University',
     skills: JSON.stringify(['R', 'Statistics', 'Data Analysis']),
     interests: JSON.stringify(['Data Science']),
     goals: 'Guide students in statistical analysis and data interpretation',
-    headline: 'Data Scientist'
+    headline: 'Data Scientist',
+    linkedinUrl: 'https://www.linkedin.com/in/sophie-agbekpenou/',
+    profileImageUrl: '/uploads/sophie.jpg',
   },
 
   // Mentees
@@ -93,7 +105,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['Python', 'Data Analysis']),
     interests: JSON.stringify(['Artificial Intelligence']),
     goals: 'Learn more about AI',
-    headline: 'Aspiring Data Scientist'
+    headline: 'Aspiring Data Scientist',
+    linkedinUrl: '',
+    profileImageUrl: ''
   },
   {
     firstName: 'Diana',
@@ -106,7 +120,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['JavaScript', 'CSS']),
     interests: JSON.stringify(['Web Development']),
     goals: 'Become a full-stack developer',
-    headline: 'Web Development Enthusiast'
+    headline: 'Web Development Enthusiast',
+    linkedinUrl: '',
+    profileImageUrl: ''
   },
   {
     firstName: 'Ivy',
@@ -119,7 +135,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['Java', 'Data Structures']),
     interests: JSON.stringify(['Backend Development']),
     goals: 'Master backend technologies',
-    headline: 'Backend Development Learner'
+    headline: 'Backend Development Learner',
+    linkedinUrl: '',
+    profileImageUrl: ''
   },
   {
     firstName: 'Jack',
@@ -132,7 +150,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['C++', 'Algorithms']),
     interests: JSON.stringify(['Competitive Programming']),
     goals: 'Improve problem-solving skills',
-    headline: 'Competitive Programmer'
+    headline: 'Competitive Programmer',
+    linkedinUrl: '',
+    profileImageUrl: ''
   },
   {
     firstName: 'Kate',
@@ -145,7 +165,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['HTML', 'CSS', 'JavaScript']),
     interests: JSON.stringify(['Frontend Development']),
     goals: 'Enhance frontend development skills',
-    headline: 'Frontend Developer'
+    headline: 'Frontend Developer',
+    linkedinUrl: '',
+    profileImageUrl: ''
   },
   {
     firstName: 'Leo',
@@ -158,7 +180,9 @@ const sampleProfiles = [
     skills: JSON.stringify(['R', 'Excel']),
     interests: JSON.stringify(['Data Analysis']),
     goals: 'Gain expertise in data visualization and analysis',
-    headline: 'Data Analyst'
+    headline: 'Data Analyst',
+    linkedinUrl: '',
+    profileImageUrl: ''
   }
 ];
 

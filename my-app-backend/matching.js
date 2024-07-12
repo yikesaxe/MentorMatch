@@ -43,7 +43,7 @@ async function rankMentorsForMentees(profiles) {
     mentorScores.sort((a, b) => b.score - a.score);
     return {
       mentee,
-      mentors: mentorScores.slice(0, 3)
+      mentors: mentorScores.slice(0, 6)
     };
   });
 

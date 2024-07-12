@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import CollegeAutocomplete from './CollegeAutocomplete';
 import LocationAutocomplete from './LocationAutocomplete';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = ({ setAuth }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,6 +19,7 @@ const AuthPage = ({ setAuth }) => {
   const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -29,6 +31,7 @@ const AuthPage = ({ setAuth }) => {
         localStorage.setItem('token', token);
         localStorage.setItem('id', id);
         setError('');
+        navigate('/');  // Redirect to home page
       })
       .catch(error => {
         console.error('Error logging in:', error);
