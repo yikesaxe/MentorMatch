@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import LocationAutocomplete from './LocationAutocomplete';
 
 const ProfileForm = ({ user, onSave }) => {
-  const [firstName, setFirstName] = useState(user.firstName || '');
-  const [lastName, setLastName] = useState(user.lastName || '');
-  const [preferredName, setPreferredName] = useState(user.preferredName || '');
-  const [headline, setHeadline] = useState(user.headline || '');
-  const [location, setLocation] = useState(user.location || '');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [preferredName, setPreferredName] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [location, setLocation] = useState('');
 
   useEffect(() => {
     setFirstName(user.firstName || '');
@@ -22,7 +23,7 @@ const ProfileForm = ({ user, onSave }) => {
       lastName,
       preferredName,
       headline,
-      location
+      location,
     });
   };
 
@@ -66,12 +67,7 @@ const ProfileForm = ({ user, onSave }) => {
       </div>
       <div className="flex flex-col">
         <label className="mb-2 text-lg font-medium">Location:</label>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md"
-        />
+        <LocationAutocomplete value={location} onChange={setLocation} />
       </div>
       <button type="submit" className="mt-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
         Save
@@ -81,5 +77,4 @@ const ProfileForm = ({ user, onSave }) => {
 };
 
 export default ProfileForm;
-
 

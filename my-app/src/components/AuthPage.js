@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import CollegeAutocomplete from './CollegeAutocomplete';
+import LocationAutocomplete from './LocationAutocomplete';
 
 const AuthPage = ({ setAuth }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,23 +19,24 @@ const AuthPage = ({ setAuth }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:8001/login', { email, password });
-      const token = response.data.token;
-      const id = response.data.id;
-      setAuth(token, id);
-      localStorage.setItem('token', token);
-      localStorage.setItem('id', id);
-      setError('');
-    } catch (error) {
-      console.error('Error logging in:', error);
-      setError('Login failed');
-    }
+    axios.post('http://localhost:8001/login', { email, password })
+      .then(response => {
+        const token = response.data.token;
+        const id = response.data.id;
+        setAuth(token, id);
+        localStorage.setItem('token', token);
+        localStorage.setItem('id', id);
+        setError('');
+      })
+      .catch(error => {
+        console.error('Error logging in:', error);
+        setError('Login failed');
+      });
   };
 
-  const handleRegister = async (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
     const newUser = {
       firstName,
@@ -48,20 +51,21 @@ const AuthPage = ({ setAuth }) => {
       goals: JSON.stringify(goals.split(',')),
       location
     };
-    try {
-      await axios.post('http://localhost:8001/register', newUser);
-      setSuccess('Registration successful. Please log in.');
-      setError('');
-      setIsLogin(true);
-    } catch (error) {
-      console.error('Error registering:', error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setError(error.response.data.error);
-      } else {
-        setError('Registration failed');
-      }
-      setSuccess('');
-    }
+    axios.post('http://localhost:8001/register', newUser)
+      .then(response => {
+        setSuccess('Registration successful. Please log in.');
+        setError('');
+        setIsLogin(true);
+      })
+      .catch(error => {
+        console.error('Error registering:', error);
+        if (error.response && error.response.data && error.response.data.error) {
+          setError(error.response.data.error);
+        } else {
+          setError('Registration failed');
+        }
+        setSuccess('');
+      });
   };
 
   return (
@@ -113,12 +117,7 @@ const AuthPage = ({ setAuth }) => {
               </div>
               <div>
                 <label className="block text-gray-700">University:</label>
-                <input
-                  type="text"
-                  value={university}
-                  onChange={(e) => setUniversity(e.target.value)}
-                  className="mt-1 p-2 w-full border rounded-md"
-                />
+                <CollegeAutocomplete value={university} onChange={setUniversity} />
               </div>
               <div>
                 <label className="block text-gray-700">Skills (comma-separated):</label>
@@ -149,12 +148,7 @@ const AuthPage = ({ setAuth }) => {
               </div>
               <div>
                 <label className="block text-gray-700">Location:</label>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="mt-1 p-2 w-full border rounded-md"
-                />
+                <LocationAutocomplete value={location} onChange={setLocation} />
               </div>
             </>
           )}

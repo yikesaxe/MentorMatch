@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
+    "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "react-places-autocomplete": "^7.3.0"
   }
 }
